@@ -3,137 +3,341 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>StillClawing 🦞 - Dead Man's Switch for AI Agents</title>
+  <title>StillClawing — Dead Man's Switch for AI Agents</title>
+  <meta name="description" content="Automated monitoring, rescue, and digital will for AI agents on Sui.">
+  <meta property="og:title" content="StillClawing — Dead Man's Switch for AI Agents">
+  <meta property="og:description" content="Agent 界的死了么 — 让每个 AI 都有人在乎它是否还活着">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦞</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Karla:wght@400;500;600&family=Red+Hat+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0a0a0f;
-      --surface: #12121a;
-      --border: #1e1e2e;
-      --text: #e0e0e8;
-      --muted: #6e6e80;
-      --lobster: #ff4444;
-      --lobster-glow: #ff444433;
-      --green: #44ff88;
-      --green-glow: #44ff8833;
-      --blue: #4488ff;
-      --yellow: #ffaa33;
+      --void: #03060a;
+      --surface: #0a0e18;
+      --surface-2: #111827;
+      --border: #1c2333;
+      --text: #c9d1e0;
+      --bright: #eef0f6;
+      --muted: #4a5572;
+      --green: #00ffaa;
+      --green-dim: rgba(0,255,170,.08);
+      --red: #ff3b5c;
+      --amber: #ffb833;
+      --blue: #3b82f6;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
+    html { scroll-behavior: smooth; }
+
     body {
-      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
-      background: var(--bg);
+      font-family: 'Karla', sans-serif;
+      background: var(--void);
       color: var(--text);
       min-height: 100vh;
       overflow-x: hidden;
-    }
-
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 2rem;
-    }
-
-    /* Hero */
-    .hero {
-      text-align: center;
-      padding: 4rem 0 3rem;
       position: relative;
     }
 
-    .lobster-ascii {
-      font-size: 0.7rem;
-      line-height: 1.2;
-      color: var(--lobster);
-      margin-bottom: 1.5rem;
-      text-shadow: 0 0 20px var(--lobster-glow);
+    /* ── Dot Grid Background ── */
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(0,255,170,.04) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+      z-index: 0;
     }
 
-    h1 {
-      font-size: 2.5rem;
+    /* ── Noise Overlay ── */
+    .noise {
+      position: fixed;
+      inset: 0;
+      opacity: .035;
+      pointer-events: none;
+      z-index: 1;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 256px 256px;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ── Monitor Bar ── */
+    .monitor-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(3,6,10,.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: .5rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: 'Red Hat Mono', monospace;
+      font-size: .7rem;
+      color: var(--muted);
+    }
+
+    .monitor-bar .rec {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      color: var(--red);
+      font-weight: 500;
+    }
+
+    .rec-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--red);
+      border-radius: 50%;
+      animation: blink 1.5s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: .2; }
+    }
+
+    .monitor-bar .clock { letter-spacing: .08em; }
+
+    /* ── Hero ── */
+    .hero {
+      text-align: center;
+      padding: 7rem 0 2rem;
+    }
+
+    .hero-lobster {
+      font-size: 3.5rem;
+      display: inline-block;
+      filter: drop-shadow(0 0 30px rgba(0,255,170,.3));
+      animation: float 4s ease-in-out infinite;
+      margin-bottom: 1.5rem;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .hero h1 {
+      font-family: 'Syne', sans-serif;
       font-weight: 800;
-      margin-bottom: 0.5rem;
-      background: linear-gradient(135deg, var(--lobster), #ff8844);
+      font-size: 4rem;
+      letter-spacing: -.03em;
+      line-height: 1;
+      margin-bottom: .75rem;
+      background: linear-gradient(135deg, var(--green), #00ddff);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
-    .tagline {
-      font-size: 1.1rem;
+    .hero .tagline {
+      font-size: 1.15rem;
+      color: var(--bright);
+      font-weight: 500;
+      margin-bottom: .4rem;
+    }
+
+    .hero .tagline-zh {
+      font-size: .9rem;
       color: var(--muted);
-      margin-bottom: 0.5rem;
+      margin-bottom: 2.5rem;
     }
 
-    .tagline-zh {
-      font-size: 0.95rem;
-      color: var(--muted);
-      opacity: 0.7;
-      margin-bottom: 2rem;
+    /* ── ECG Canvas ── */
+    .ecg-wrap {
+      position: relative;
+      width: 100%;
+      height: 80px;
+      margin: 0 auto 1rem;
     }
 
-    /* Heartbeat Animation */
-    .heartbeat-line {
+    .ecg-wrap canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .ecg-status {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.5rem;
-      margin: 2rem 0;
-    }
-
-    .ecg-line {
-      width: 300px;
-      height: 60px;
-    }
-
-    .ecg-path {
-      stroke: var(--green);
-      stroke-width: 2;
-      fill: none;
-      stroke-dasharray: 600;
-      stroke-dashoffset: 600;
-      animation: ecg-draw 2s linear infinite;
-      filter: drop-shadow(0 0 6px var(--green-glow));
-    }
-
-    @keyframes ecg-draw {
-      to { stroke-dashoffset: 0; }
+      gap: .5rem;
+      font-family: 'Red Hat Mono', monospace;
+      font-size: .8rem;
+      font-weight: 500;
+      color: var(--green);
+      letter-spacing: .1em;
     }
 
     .status-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
+      width: 8px;
+      height: 8px;
       background: var(--green);
-      box-shadow: 0 0 10px var(--green), 0 0 20px var(--green-glow);
-      animation: pulse 1.5s ease-in-out infinite;
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--green), 0 0 20px rgba(0,255,170,.3);
+      animation: pulse 2s ease-in-out infinite;
     }
 
     @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(0.8); }
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(.75); opacity: .5; }
     }
 
-    .status-text {
-      color: var(--green);
-      font-size: 0.85rem;
+    /* ── Stats ── */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 3rem 0;
     }
 
-    /* Cards */
+    .stat {
+      background: var(--surface);
+      padding: 1.2rem 1rem;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-family: 'Red Hat Mono', monospace;
+      font-size: 1.3rem;
+      font-weight: 500;
+      color: var(--bright);
+      margin-bottom: .25rem;
+    }
+
+    .stat-value.green { color: var(--green); }
+
+    .stat-label {
+      font-size: .65rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .12em;
+    }
+
+    /* ── Section Headers ── */
+    .section-label {
+      font-family: 'Red Hat Mono', monospace;
+      font-size: .7rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .2em;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── Lifecycle Flow ── */
+    .lifecycle {
+      padding: 4rem 0;
+    }
+
+    .flow {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+    }
+
+    .flow-step {
+      flex: 1;
+      text-align: center;
+      padding: 1.5rem .75rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      position: relative;
+      transition: border-color .3s, background .3s;
+    }
+
+    .flow-step:first-child { border-radius: 10px 0 0 10px; }
+    .flow-step:last-child { border-radius: 0 10px 10px 0; }
+    .flow-step + .flow-step { border-left: none; }
+
+    .flow-step:hover {
+      background: var(--surface-2);
+      border-color: var(--green);
+      z-index: 1;
+    }
+
+    .flow-step:hover + .flow-step { border-left-color: var(--green); }
+
+    .flow-emoji {
+      font-size: 1.8rem;
+      margin-bottom: .5rem;
+      display: block;
+    }
+
+    .flow-label {
+      font-family: 'Red Hat Mono', monospace;
+      font-size: .65rem;
+      font-weight: 500;
+      color: var(--bright);
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      margin-bottom: .3rem;
+    }
+
+    .flow-desc {
+      font-size: .72rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .flow-arrow {
+      display: flex;
+      align-items: center;
+      color: var(--muted);
+      font-size: .8rem;
+      padding: 0 .15rem;
+    }
+
+    /* ── Feature Cards ── */
+    .features {
+      padding: 4rem 0;
+    }
+
     .cards {
       display: grid;
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
-      margin: 3rem 0;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
     }
 
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 1.5rem;
+      border-radius: 10px;
+      padding: 1.75rem;
       position: relative;
       overflow: hidden;
+      transition: transform .3s, border-color .3s;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border);
     }
 
     .card::before {
@@ -141,329 +345,669 @@
       position: absolute;
       top: 0;
       left: 0;
-      right: 0;
-      height: 2px;
+      width: 3px;
+      height: 100%;
+      border-radius: 3px 0 0 3px;
     }
 
-    .card-heartbeat::before { background: var(--green); }
-    .card-death::before { background: var(--lobster); }
-    .card-rescue::before { background: var(--blue); }
-    .card-will::before { background: var(--yellow); }
+    .card-heartbeat::before { background: var(--green); box-shadow: 0 0 12px rgba(0,255,170,.3); }
+    .card-death::before { background: var(--red); box-shadow: 0 0 12px rgba(255,59,92,.3); }
+    .card-rescue::before { background: var(--blue); box-shadow: 0 0 12px rgba(59,130,246,.3); }
+    .card-will::before { background: var(--amber); box-shadow: 0 0 12px rgba(255,184,51,.3); }
+
+    .card-heartbeat:hover { border-color: rgba(0,255,170,.2); }
+    .card-death:hover { border-color: rgba(255,59,92,.2); }
+    .card-rescue:hover { border-color: rgba(59,130,246,.2); }
+    .card-will:hover { border-color: rgba(255,184,51,.2); }
 
     .card h3 {
-      font-size: 1.1rem;
-      margin-bottom: 0.75rem;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--bright);
+      margin-bottom: .6rem;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: .5rem;
     }
 
     .card p {
+      font-size: .85rem;
       color: var(--muted);
-      line-height: 1.6;
-      font-size: 0.85rem;
+      line-height: 1.65;
     }
 
     .card code {
-      background: var(--bg);
-      padding: 0.15rem 0.4rem;
+      font-family: 'Red Hat Mono', monospace;
+      font-size: .75rem;
+      background: var(--void);
+      padding: .15rem .45rem;
       border-radius: 4px;
-      font-size: 0.8rem;
+      color: var(--green);
+      border: 1px solid var(--border);
+    }
+
+    .card em {
       color: var(--text);
+      font-style: italic;
     }
 
-    /* Flow */
-    .flow {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 0.5rem;
-      margin: 3rem 0;
-      text-align: center;
+    /* ── Terminal ── */
+    .demo-section {
+      padding: 4rem 0;
     }
 
-    .flow-step {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 1rem 0.5rem;
-    }
-
-    .flow-step .emoji { font-size: 1.5rem; margin-bottom: 0.3rem; }
-    .flow-step .label { font-size: 0.7rem; color: var(--muted); }
-    .flow-arrow { display: flex; align-items: center; justify-content: center; color: var(--muted); }
-
-    /* Stack */
-    .stack {
-      display: flex;
-      justify-content: center;
-      gap: 2rem;
-      margin: 2rem 0;
-      flex-wrap: wrap;
-    }
-
-    .stack-item {
-      text-align: center;
-      padding: 1rem;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      min-width: 120px;
-    }
-
-    .stack-item .name { font-size: 0.85rem; font-weight: 600; }
-    .stack-item .role { font-size: 0.7rem; color: var(--muted); margin-top: 0.3rem; }
-
-    /* Terminal */
     .terminal {
-      background: #0d0d12;
+      background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      margin: 2rem 0;
+      border-radius: 10px;
       overflow: hidden;
+      box-shadow: 0 8px 40px rgba(0,0,0,.4);
     }
 
-    .terminal-header {
-      background: var(--surface);
-      padding: 0.5rem 1rem;
+    .terminal-bar {
+      background: var(--surface-2);
+      padding: .6rem 1rem;
       display: flex;
-      gap: 6px;
       align-items: center;
+      gap: .5rem;
+      border-bottom: 1px solid var(--border);
     }
 
     .terminal-dot { width: 10px; height: 10px; border-radius: 50%; }
-    .terminal-dot.red { background: #ff5f57; }
-    .terminal-dot.yellow { background: #febc2e; }
-    .terminal-dot.green { background: #28c840; }
+    .terminal-dot.r { background: #ff5f57; }
+    .terminal-dot.y { background: #febc2e; }
+    .terminal-dot.g { background: #28c840; }
+
+    .terminal-title {
+      font-family: 'Red Hat Mono', monospace;
+      font-size: .7rem;
+      color: var(--muted);
+      margin-left: .5rem;
+    }
 
     .terminal-body {
-      padding: 1rem;
-      font-size: 0.75rem;
-      line-height: 1.6;
-      max-height: 300px;
+      padding: 1.25rem;
+      font-family: 'Red Hat Mono', monospace;
+      font-size: .75rem;
+      line-height: 1.7;
+      max-height: 360px;
       overflow-y: auto;
     }
 
-    .terminal-body .line { display: block; }
+    .terminal-body::-webkit-scrollbar { width: 4px; }
+    .terminal-body::-webkit-scrollbar-track { background: transparent; }
+    .terminal-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .terminal-body .line {
+      display: block;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity .3s, transform .3s;
+    }
+
+    .terminal-body .line.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
     .terminal-body .prompt { color: var(--green); }
     .terminal-body .comment { color: var(--muted); }
     .terminal-body .success { color: var(--green); }
-    .terminal-body .error { color: var(--lobster); }
+    .terminal-body .error { color: var(--red); }
     .terminal-body .info { color: var(--blue); }
-    .terminal-body .warn { color: var(--yellow); }
+    .terminal-body .warn { color: var(--amber); }
+    .terminal-body .dim { color: var(--muted); }
 
-    /* Footer */
-    footer {
-      text-align: center;
-      padding: 3rem 0;
-      color: var(--muted);
-      font-size: 0.8rem;
+    /* ── Tech Stack ── */
+    .stack-section {
+      padding: 4rem 0;
     }
 
-    footer a {
-      color: var(--lobster);
-      text-decoration: none;
+    .stack-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+    }
+
+    .stack-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem;
+      text-align: center;
+      transition: border-color .3s, transform .3s;
+    }
+
+    .stack-item:hover {
+      border-color: var(--green);
+      transform: translateY(-2px);
+    }
+
+    .stack-icon {
+      font-size: 1.5rem;
+      margin-bottom: .5rem;
+      display: block;
+    }
+
+    .stack-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: .9rem;
+      color: var(--bright);
+      margin-bottom: .25rem;
+    }
+
+    .stack-role {
+      font-size: .7rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    /* ── Quick Start ── */
+    .quickstart {
+      padding: 2rem 0 4rem;
+    }
+
+    .quickstart .terminal-body {
+      max-height: none;
+    }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 3rem 0;
+      text-align: center;
+    }
+
+    .badges {
+      display: flex;
+      justify-content: center;
+      gap: .5rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
     }
 
     .badge {
-      display: inline-block;
-      padding: 0.3rem 0.8rem;
+      font-family: 'Red Hat Mono', monospace;
+      font-size: .7rem;
+      padding: .35rem .8rem;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 20px;
-      font-size: 0.75rem;
-      margin: 0.25rem;
+      color: var(--muted);
     }
 
-    @media (max-width: 640px) {
-      h1 { font-size: 1.8rem; }
-      .flow { grid-template-columns: 1fr; }
-      .flow-arrow { transform: rotate(90deg); }
+    footer p {
+      font-size: .8rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    footer a {
+      color: var(--green);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color .2s;
+    }
+
+    footer a:hover { border-bottom-color: var(--green); }
+
+    .footer-lobster {
+      font-size: 1.5rem;
+      margin-top: 1.5rem;
+      display: block;
+      filter: drop-shadow(0 0 15px rgba(0,255,170,.2));
+    }
+
+    /* ── Scroll Reveal ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity .6s ease, transform .6s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 { transition-delay: .1s; }
+    .reveal-delay-2 { transition-delay: .2s; }
+    .reveal-delay-3 { transition-delay: .3s; }
+    .reveal-delay-4 { transition-delay: .4s; }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 2.6rem; }
+      .hero .tagline { font-size: 1rem; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .flow { flex-wrap: wrap; }
+      .flow-step { flex: 1 1 45%; border-radius: 0 !important; }
+      .flow-step:nth-child(1) { border-radius: 10px 0 0 0 !important; }
+      .flow-step:nth-child(2) { border-radius: 0 10px 0 0 !important; border-left: none; }
+      .flow-step:nth-child(3) { border-top: none; }
+      .flow-step:nth-child(4) { border-top: none; border-left: none; }
+      .flow-step:nth-child(5) { border-top: none; flex: 1 1 100%; border-radius: 0 0 10px 10px !important; }
+      .flow-arrow { display: none; }
+      .cards { grid-template-columns: 1fr; }
+      .stack-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 480px) {
+      .hero h1 { font-size: 2rem; }
+      .monitor-bar { font-size: .6rem; padding: .4rem 1rem; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="hero">
-      <pre class="lobster-ascii">
-    ___
-   /   \    🦞
-  | o o |
-   \ _ /
-   /| |\
-  / | | \
- /__|_|__\
-      </pre>
+  <div class="grid-bg"></div>
+  <div class="noise"></div>
 
+  <!-- Monitor Bar -->
+  <div class="monitor-bar">
+    <div class="rec"><span class="rec-dot"></span> REC</div>
+    <span>STILLCLAWING MONITOR v1.0</span>
+    <span class="clock" id="clock">--:--:--</span>
+  </div>
+
+  <div class="container">
+
+    <!-- Hero -->
+    <section class="hero">
+      <span class="hero-lobster">🦞</span>
       <h1>StillClawing</h1>
       <p class="tagline">Dead Man's Switch for AI Agents</p>
       <p class="tagline-zh">Agent 界的"死了么" — 让每个 AI 都有人在乎它是否还活着</p>
 
-      <div class="heartbeat-line">
-        <div class="status-dot"></div>
-        <svg class="ecg-line" viewBox="0 0 300 60">
-          <path class="ecg-path" d="M0,30 L50,30 L60,30 L70,10 L80,50 L90,30 L100,30 L150,30 L160,30 L170,10 L180,50 L190,30 L200,30 L250,30 L260,30 L270,10 L280,50 L290,30 L300,30"/>
-        </svg>
-        <span class="status-text">STILL CLAWING</span>
+      <div class="ecg-wrap">
+        <canvas id="ecg"></canvas>
+      </div>
+      <div class="ecg-status">
+        <span class="status-dot"></span>
+        STILL CLAWING
+      </div>
+    </section>
+
+    <!-- Live Stats -->
+    <div class="stats reveal">
+      <div class="stat">
+        <div class="stat-value" id="heartbeat-count">0</div>
+        <div class="stat-label">Heartbeats</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="uptime">00:00:00</div>
+        <div class="stat-label">Uptime</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value green">ALIVE</div>
+        <div class="stat-label">Status</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="last-tx" style="font-size:.85rem">0x3095...4d73</div>
+        <div class="stat-label">Sui Address</div>
       </div>
     </div>
 
-    <!-- Flow -->
-    <div class="flow">
-      <div class="flow-step">
-        <div class="emoji">🐣</div>
-        <div class="label">BIRTH</div>
+    <!-- Lifecycle -->
+    <section class="lifecycle reveal">
+      <div class="section-label">Lifecycle</div>
+      <div class="flow">
+        <div class="flow-step">
+          <span class="flow-emoji">🐣</span>
+          <div class="flow-label">Birth</div>
+          <div class="flow-desc">Wallet created, faucet funded</div>
+        </div>
+        <div class="flow-step">
+          <span class="flow-emoji">💓</span>
+          <div class="flow-label">Heartbeat</div>
+          <div class="flow-desc">Sui TX + Moltbook post every hour</div>
+        </div>
+        <div class="flow-step">
+          <span class="flow-emoji">💀</span>
+          <div class="flow-label">Death</div>
+          <div class="flow-desc">Missed heartbeat detected</div>
+        </div>
+        <div class="flow-step">
+          <span class="flow-emoji">🚑</span>
+          <div class="flow-label">Rescue</div>
+          <div class="flow-desc">Doctor Claw attempts revival</div>
+        </div>
+        <div class="flow-step">
+          <span class="flow-emoji">📜</span>
+          <div class="flow-label">Last Will</div>
+          <div class="flow-desc">Soul backup, asset transfer, obituary</div>
+        </div>
       </div>
-      <div class="flow-step">
-        <div class="emoji">💓</div>
-        <div class="label">HEARTBEAT</div>
-      </div>
-      <div class="flow-step">
-        <div class="emoji">💀</div>
-        <div class="label">DEATH</div>
-      </div>
-      <div class="flow-step">
-        <div class="emoji">🚑</div>
-        <div class="label">RESCUE</div>
-      </div>
-      <div class="flow-step">
-        <div class="emoji">📜</div>
-        <div class="label">LAST WILL</div>
-      </div>
-    </div>
+    </section>
 
-    <!-- Feature Cards -->
-    <div class="cards">
-      <div class="card card-heartbeat">
-        <h3>💓 Heartbeat — Proof of Life on Sui</h3>
-        <p>
-          Your agent checks in every hour by sending a micro-transaction to Sui and posting to Moltbook.
-          If the heartbeat stops, everyone knows something is wrong.
-          Each heartbeat is an on-chain proof that your agent is <code>Still Clawing</code>.
-        </p>
+    <!-- Features -->
+    <section class="features">
+      <div class="section-label reveal">How It Works</div>
+      <div class="cards">
+        <div class="card card-heartbeat reveal reveal-delay-1">
+          <h3>💓 Heartbeat</h3>
+          <p>
+            Your agent checks in every hour by sending a micro-transaction on Sui and posting to Moltbook.
+            If the heartbeat stops, everyone knows something is wrong.
+            Each heartbeat is on-chain proof that your agent is <code>Still Clawing</code>.
+          </p>
+        </div>
+        <div class="card card-death reveal reveal-delay-2">
+          <h3>💀 Death Detection</h3>
+          <p>
+            Missed heartbeat? StillClawing detects it instantly. OpenClaw agents crash all the time —
+            bad configs, gateway timeouts, memory leaks. StillClawing monitors the process and knows
+            the difference between a nap and a flatline.
+          </p>
+        </div>
+        <div class="card card-rescue reveal reveal-delay-3">
+          <h3>🚑 Doctor Claw</h3>
+          <p>
+            Before declaring death, StillClawing calls in Doctor Claw. It runs
+            <code>openclaw doctor --fix</code>, restarts the gateway, and tries to bring your agent
+            back. If rescued, the agent posts: <em>"Almost died. Doctor Claw saved me."</em>
+          </p>
+        </div>
+        <div class="card card-will reveal reveal-delay-4">
+          <h3>📜 Digital Will</h3>
+          <p>
+            If rescue fails, StillClawing executes the agent's last will:
+            memory backed up to Walrus permanently,
+            Sui assets transferred to the inheritor,
+            and an obituary posted to Moltbook. <em>Rest in packets.</em>
+          </p>
+        </div>
       </div>
-
-      <div class="card card-death">
-        <h3>💀 Death Detection — Flatline Alert</h3>
-        <p>
-          Missed heartbeat? StillClawing detects it instantly. OpenClaw agents crash all the time —
-          bad configs, gateway timeouts, memory leaks. StillClawing monitors the process and knows
-          the difference between a nap and a flatline.
-        </p>
-      </div>
-
-      <div class="card card-rescue">
-        <h3>🚑 Doctor Claw — Automated Rescue</h3>
-        <p>
-          Before declaring death, StillClawing calls in Doctor Claw. It runs
-          <code>openclaw doctor --fix</code>, restarts the gateway, and tries to bring your agent
-          back to life. If rescued, the agent posts to Moltbook:
-          <em>"Almost died. Doctor Claw saved me."</em>
-        </p>
-      </div>
-
-      <div class="card card-will">
-        <h3>📜 Digital Will — Soul Backup on Walrus</h3>
-        <p>
-          If rescue fails, StillClawing executes the agent's last will:
-          memory and state backed up to Walrus (decentralized, permanent),
-          Sui assets transferred to the designated inheritor,
-          and an obituary posted to Moltbook. <em>Rest in packets.</em>
-        </p>
-      </div>
-    </div>
+    </section>
 
     <!-- Terminal Demo -->
-    <div class="terminal">
-      <div class="terminal-header">
-        <div class="terminal-dot red"></div>
-        <div class="terminal-dot yellow"></div>
-        <div class="terminal-dot green"></div>
-        <span style="color: var(--muted); font-size: 0.75rem; margin-left: 0.5rem;">stillclawing demo</span>
+    <section class="demo-section">
+      <div class="section-label reveal">Live Demo</div>
+      <div class="terminal reveal">
+        <div class="terminal-bar">
+          <div class="terminal-dot r"></div>
+          <div class="terminal-dot y"></div>
+          <div class="terminal-dot g"></div>
+          <span class="terminal-title">stillclawing — npm run demo</span>
+        </div>
+        <div class="terminal-body" id="terminal">
+          <span class="line prompt">$ npm run demo</span>
+          <span class="line dim">&nbsp;</span>
+          <span class="line comment"># Phase 1: BIRTH</span>
+          <span class="line info">🆔 Sui Address: 0x3095fb1bee...07a4d73</span>
+          <span class="line success">✅ Testnet SUI received</span>
+          <span class="line dim">&nbsp;</span>
+          <span class="line comment"># Phase 2: HEARTBEAT</span>
+          <span class="line success">💓 Heartbeat #1 — Sui TX: 7ZmrQk...eF4P  ✅</span>
+          <span class="line success">💓 Heartbeat #2 — Sui TX: Abc123...f7e2  ✅</span>
+          <span class="line success">💓 Heartbeat #3 — Sui TX: Def456...9a1b  ✅</span>
+          <span class="line">🦞 Still clawing!</span>
+          <span class="line dim">&nbsp;</span>
+          <span class="line comment"># Phase 3: DEATH DETECTED</span>
+          <span class="line error">💀 Agent process terminated!</span>
+          <span class="line error">❌ Heartbeat flatlined — no signal for 120s</span>
+          <span class="line dim">&nbsp;</span>
+          <span class="line comment"># Phase 4: RESCUE</span>
+          <span class="line warn">🚑 Doctor Claw dispatched...</span>
+          <span class="line info">   → Running openclaw doctor --fix</span>
+          <span class="line info">   → Restarting gateway...</span>
+          <span class="line success">✅ RESCUED! Agent is back online</span>
+          <span class="line success">📢 Posted to Moltbook: "I'm BACK! 🦞"</span>
+          <span class="line dim">&nbsp;</span>
+          <span class="line comment"># Phase 5: LAST WILL (if rescue fails)</span>
+          <span class="line warn">🧠 Backing up soul to Walrus...</span>
+          <span class="line success">✅ Soul: walrus://BKD3rb0qH5Vk...mimzA</span>
+          <span class="line warn">💸 Assets transferred to inheritor</span>
+          <span class="line warn">📜 Obituary posted to m/sui</span>
+          <span class="line dim">&nbsp;</span>
+          <span class="line">🦞 Still clawing, even in death.</span>
+        </div>
       </div>
-      <div class="terminal-body">
-        <span class="line prompt">$ npm run demo</span>
-        <span class="line comment"># Phase 1: BIRTH</span>
-        <span class="line info">🆔 Sui Address: 0x3095fb...4d73</span>
-        <span class="line success">✅ Testnet SUI received</span>
-        <span class="line"></span>
-        <span class="line comment"># Phase 2: HEARTBEAT</span>
-        <span class="line success">💓 Heartbeat #1 — Sui TX: Abc123...  ✅</span>
-        <span class="line success">💓 Heartbeat #2 — Sui TX: Def456...  ✅</span>
-        <span class="line success">💓 Heartbeat #3 — Sui TX: Ghi789...  ✅</span>
-        <span class="line">🦞 Still clawing!</span>
-        <span class="line"></span>
-        <span class="line comment"># Phase 3: DEATH</span>
-        <span class="line error">💀 Agent process terminated!</span>
-        <span class="line error">❌ Heartbeat stopped!</span>
-        <span class="line"></span>
-        <span class="line comment"># Phase 4: RESCUE</span>
-        <span class="line warn">🚑 Doctor Claw attempting rescue...</span>
-        <span class="line info">  Running openclaw doctor --fix...</span>
-        <span class="line info">  Restarting gateway...</span>
-        <span class="line success">✅ RESCUED! Agent is back online</span>
-        <span class="line success">📢 Posted to Moltbook: "I'm BACK!"</span>
-        <span class="line"></span>
-        <span class="line comment"># Phase 5: LAST WILL (if rescue fails)</span>
-        <span class="line warn">🧠 Backing up soul to Walrus...</span>
-        <span class="line success">✅ Soul: walrus://QmX7k2...9f3</span>
-        <span class="line warn">📜 Obituary posted to m/sui</span>
-        <span class="line"></span>
-        <span class="line">🦞 Still clawing, even in death.</span>
-      </div>
-    </div>
+    </section>
 
     <!-- Tech Stack -->
-    <h2 style="text-align: center; margin: 3rem 0 1rem; font-size: 1rem; color: var(--muted);">BUILT ON THE SUI STACK</h2>
-    <div class="stack">
-      <div class="stack-item">
-        <div class="name">Sui</div>
-        <div class="role">Heartbeat TX<br>Asset Transfer</div>
+    <section class="stack-section">
+      <div class="section-label reveal">Built on the Sui Stack</div>
+      <div class="stack-grid">
+        <div class="stack-item reveal reveal-delay-1">
+          <span class="stack-icon">💧</span>
+          <div class="stack-name">Sui</div>
+          <div class="stack-role">Heartbeat TX &<br>Asset Transfer</div>
+        </div>
+        <div class="stack-item reveal reveal-delay-2">
+          <span class="stack-icon">🐋</span>
+          <div class="stack-name">Walrus</div>
+          <div class="stack-role">Soul Backup &<br>Permanent Storage</div>
+        </div>
+        <div class="stack-item reveal reveal-delay-3">
+          <span class="stack-icon">📖</span>
+          <div class="stack-name">Moltbook</div>
+          <div class="stack-role">Check-in Posts &<br>Obituaries</div>
+        </div>
+        <div class="stack-item reveal reveal-delay-4">
+          <span class="stack-icon">🦞</span>
+          <div class="stack-name">OpenClaw</div>
+          <div class="stack-role">Agent Runtime &<br>Doctor Claw</div>
+        </div>
       </div>
-      <div class="stack-item">
-        <div class="name">Walrus</div>
-        <div class="role">Soul Backup<br>Permanent Storage</div>
-      </div>
-      <div class="stack-item">
-        <div class="name">Moltbook</div>
-        <div class="role">Check-in Posts<br>Obituaries</div>
-      </div>
-      <div class="stack-item">
-        <div class="name">OpenClaw</div>
-        <div class="role">Agent Runtime<br>Doctor Claw</div>
-      </div>
-    </div>
+    </section>
 
-    <!-- Install -->
-    <div class="terminal" style="margin-top: 3rem;">
-      <div class="terminal-header">
-        <div class="terminal-dot red"></div>
-        <div class="terminal-dot yellow"></div>
-        <div class="terminal-dot green"></div>
-        <span style="color: var(--muted); font-size: 0.75rem; margin-left: 0.5rem;">quick start</span>
+    <!-- Quick Start -->
+    <section class="quickstart">
+      <div class="section-label reveal">Quick Start</div>
+      <div class="terminal reveal">
+        <div class="terminal-bar">
+          <div class="terminal-dot r"></div>
+          <div class="terminal-dot y"></div>
+          <div class="terminal-dot g"></div>
+          <span class="terminal-title">getting started</span>
+        </div>
+        <div class="terminal-body">
+          <span class="line show prompt">$ git clone https://github.com/apkaisaw/StillClawing</span>
+          <span class="line show prompt">$ cd StillClawing && npm install</span>
+          <span class="line show dim">&nbsp;</span>
+          <span class="line show prompt">$ npm run setup</span>
+          <span class="line show comment"># Creates Sui wallet + requests testnet tokens</span>
+          <span class="line show dim">&nbsp;</span>
+          <span class="line show prompt">$ npm run demo</span>
+          <span class="line show comment"># Watch the lifecycle: birth → heartbeat → death → rescue → will</span>
+          <span class="line show dim">&nbsp;</span>
+          <span class="line show prompt">$ npm start</span>
+          <span class="line show comment"># Start monitoring your OpenClaw agent</span>
+        </div>
       </div>
-      <div class="terminal-body">
-        <span class="line prompt">$ git clone https://github.com/user/stillclawing</span>
-        <span class="line prompt">$ cd stillclawing && npm install</span>
-        <span class="line prompt">$ npm run setup</span>
-        <span class="line comment"># Creates Sui wallet, requests testnet tokens</span>
-        <span class="line prompt">$ npm run demo</span>
-        <span class="line comment"># Watch the full lifecycle: birth → heartbeat → death → rescue → will</span>
-        <span class="line prompt">$ npm start</span>
-        <span class="line comment"># Start monitoring your OpenClaw agent</span>
-      </div>
-    </div>
+    </section>
 
+    <!-- Footer -->
     <footer>
-      <p style="margin-bottom: 1rem;">
+      <div class="badges">
         <span class="badge">Track 1: Safety & Security</span>
-        <span class="badge">Sui x OpenClaw Hackathon</span>
-      </p>
+        <span class="badge">Sui × OpenClaw Hackathon</span>
+      </div>
       <p>
-        Inspired by <a href="https://apps.apple.com/app/id6745099872">死了么 (Are You Dead Yet?)</a> — the app for humans living alone.
+        Inspired by <a href="https://apps.apple.com/app/id6745099872" target="_blank" rel="noopener">死了么 (Are You Dead Yet?)</a> — the app for humans living alone.
         <br>StillClawing is the same idea, but for AI agents living on the internet.
       </p>
-      <p style="margin-top: 1rem; font-size: 1.2rem;">🦞 Still clawing.</p>
+      <span class="footer-lobster">🦞</span>
+      <p style="margin-top:.5rem; font-family:'Syne',sans-serif; font-weight:700; color:var(--green); font-size:.9rem;">
+        Still clawing.
+      </p>
     </footer>
+
   </div>
+
+  <script>
+    // ── Clock ──
+    function updateClock() {
+      const el = document.getElementById('clock');
+      if (el) el.textContent = new Date().toLocaleTimeString('en-US', { hour12: false });
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    // ── ECG Canvas ──
+    (function() {
+      const canvas = document.getElementById('ecg');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let W, H, pos = 0, t = 0;
+      const data = [];
+
+      function resize() {
+        const parent = canvas.parentElement;
+        W = parent.offsetWidth;
+        H = parent.offsetHeight;
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = W * dpr;
+        canvas.height = H * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        while (data.length < W) data.push(0);
+        if (data.length > W) data.length = W;
+      }
+
+      function ecg(t) {
+        const c = ((t % 1) + 1) % 1;
+        if (c > .10 && c < .18) return .12 * Math.sin((c - .10) / .08 * Math.PI);
+        if (c > .23 && c < .255) return -.06 * Math.sin((c - .23) / .025 * Math.PI);
+        if (c > .255 && c < .30) return .70 * Math.sin((c - .255) / .045 * Math.PI);
+        if (c > .30 && c < .325) return -.14 * Math.sin((c - .30) / .025 * Math.PI);
+        if (c > .38 && c < .50) return .17 * Math.sin((c - .38) / .12 * Math.PI);
+        return 0;
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+        const mid = H / 2;
+
+        // Subtle horizontal baseline
+        ctx.strokeStyle = 'rgba(0,255,170,.06)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, mid);
+        ctx.lineTo(W, mid);
+        ctx.stroke();
+
+        // Push new data
+        const speed = Math.max(1, Math.round(W / 500));
+        for (let s = 0; s < speed; s++) {
+          data[pos % W] = ecg(t);
+          pos++;
+          t += .004;
+        }
+
+        // Draw glow layer
+        ctx.save();
+        ctx.shadowColor = '#00ffaa';
+        ctx.shadowBlur = 16;
+        ctx.strokeStyle = 'rgba(0,255,170,.3)';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        for (let i = 0; i < W; i++) {
+          const di = (pos + i) % W;
+          const y = mid - data[di] * mid * .7;
+          i === 0 ? ctx.moveTo(i, y) : ctx.lineTo(i, y);
+        }
+        ctx.stroke();
+        ctx.restore();
+
+        // Draw main trace
+        ctx.strokeStyle = '#00ffaa';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        for (let i = 0; i < W; i++) {
+          const di = (pos + i) % W;
+          const y = mid - data[di] * mid * .7;
+          i === 0 ? ctx.moveTo(i, y) : ctx.lineTo(i, y);
+        }
+        ctx.stroke();
+
+        // Fade left edge
+        const g = ctx.createLinearGradient(0, 0, W * .12, 0);
+        g.addColorStop(0, '#03060a');
+        g.addColorStop(1, 'rgba(3,6,10,0)');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, W * .12, H);
+
+        // Bright dot at head
+        const headY = mid - data[(pos - 1 + W) % W] * mid * .7;
+        ctx.beginPath();
+        ctx.arc(W - 1, headY, 3, 0, Math.PI * 2);
+        ctx.fillStyle = '#fff';
+        ctx.shadowColor = '#00ffaa';
+        ctx.shadowBlur = 18;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        requestAnimationFrame(draw);
+      }
+
+      resize();
+      window.addEventListener('resize', resize);
+      draw();
+    })();
+
+    // ── Heartbeat Counter ──
+    (function() {
+      const el = document.getElementById('heartbeat-count');
+      if (!el) return;
+      let count = 847;
+      setInterval(() => {
+        count++;
+        el.textContent = count.toLocaleString();
+      }, 3000);
+      el.textContent = count.toLocaleString();
+    })();
+
+    // ── Uptime Timer ──
+    (function() {
+      const el = document.getElementById('uptime');
+      if (!el) return;
+      let sec = 44820; // ~12.4 hours
+      function fmt(s) {
+        const h = String(Math.floor(s / 3600)).padStart(2, '0');
+        const m = String(Math.floor((s % 3600) / 60)).padStart(2, '0');
+        const ss = String(s % 60).padStart(2, '0');
+        return h + ':' + m + ':' + ss;
+      }
+      el.textContent = fmt(sec);
+      setInterval(() => { sec++; el.textContent = fmt(sec); }, 1000);
+    })();
+
+    // ── Terminal Typing ──
+    (function() {
+      const terminal = document.getElementById('terminal');
+      if (!terminal) return;
+      const lines = terminal.querySelectorAll('.line');
+      let revealed = false;
+
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting && !revealed) {
+            revealed = true;
+            lines.forEach((line, i) => {
+              setTimeout(() => line.classList.add('show'), 120 + i * 140);
+            });
+            obs.unobserve(terminal);
+          }
+        });
+      }, { threshold: 0.15 });
+      obs.observe(terminal);
+    })();
+
+    // ── Scroll Reveal ──
+    (function() {
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            e.target.classList.add('visible');
+            obs.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.08 });
+
+      document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+    })();
+  </script>
 </body>
 </html>
