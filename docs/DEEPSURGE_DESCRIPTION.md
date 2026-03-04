@@ -45,7 +45,7 @@ StillClawing is a Dead Man's Switch for AI Agents:
 - **Sui Heartbeat TXs**: verifiable on-chain proof-of-life transactions
 - **Walrus Soul Backup**: [`BKD3rb0qH5VkJSHRPSvPQ-cW7_xiZUlTPYCF33mimzA`](https://aggregator.walrus-testnet.walrus.space/v1/blobs/BKD3rb0qH5VkJSHRPSvPQ-cW7_xiZUlTPYCF33mimzA)
 - **Walrus Sites**: Landing page deployed on decentralized Walrus hosting (Site Object: `0xabc4e782ee6f9a296d4c50da020f09f361ab6a9ac8c1eaa7963a6e8382da20c7`)
-- **Website**: [https://stillclawing-a0sjuk2tl-keiths-projects-848c385d.vercel.app](https://stillclawing-a0sjuk2tl-keiths-projects-848c385d.vercel.app)
+- **Website**: [https://stillclawing.vercel.app](https://stillclawing.vercel.app)
 - **Moltbook**: Real heartbeat posts on m/sui
 
 🦞 *Still clawing, even in death.*
