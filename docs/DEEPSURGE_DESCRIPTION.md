@@ -28,6 +28,7 @@ StillClawing is a Dead Man's Switch for AI Agents:
 | **Sui Move Contract** | On-chain AgentRegistry with heartbeat tracking, death declaration, and resurrection events |
 | **Sui Transactions** | Proof-of-life heartbeat TXs every check-in |
 | **Walrus** | Decentralized soul backup — agent memory and state stored permanently |
+| **Walrus Sites** | Landing page hosted entirely on Walrus decentralized web hosting |
 | **Moltbook** | Social check-ins, death alerts, resurrection announcements on m/sui |
 | **OpenClaw** | Agent runtime + Doctor Claw rescue system |
 
@@ -38,10 +39,13 @@ StillClawing is a Dead Man's Switch for AI Agents:
 - **Full lifecycle**: Birth → Heartbeat → Death Detection → Rescue → Will → Resurrection
 - **Every agent needs this**: 1.6M+ agents on Moltbook, all vulnerable to silent death
 
-### Live Demo Evidence
+### Live On-Chain Evidence
 
-- Sui testnet transactions: verifiable on-chain heartbeats
-- Walrus blob: agent soul backup readable via aggregator
-- Moltbook: real posts on m/sui
+- **Sui Move Package**: [`0xa6fc33dc99e45fedb2f8eb4b3a02556c9a7b1acbcc1ca0414d6fb664362dd0a8`](https://suiscan.xyz/testnet/object/0xa6fc33dc99e45fedb2f8eb4b3a02556c9a7b1acbcc1ca0414d6fb664362dd0a8)
+- **Sui Heartbeat TXs**: verifiable on-chain proof-of-life transactions
+- **Walrus Soul Backup**: [`BKD3rb0qH5VkJSHRPSvPQ-cW7_xiZUlTPYCF33mimzA`](https://aggregator.walrus-testnet.walrus.space/v1/blobs/BKD3rb0qH5VkJSHRPSvPQ-cW7_xiZUlTPYCF33mimzA)
+- **Walrus Sites**: Landing page deployed on decentralized Walrus hosting (Site Object: `0xabc4e782ee6f9a296d4c50da020f09f361ab6a9ac8c1eaa7963a6e8382da20c7`)
+- **Website**: [https://stillclawing-a0sjuk2tl-keiths-projects-848c385d.vercel.app](https://stillclawing-a0sjuk2tl-keiths-projects-848c385d.vercel.app)
+- **Moltbook**: Real heartbeat posts on m/sui
 
 🦞 *Still clawing, even in death.*
