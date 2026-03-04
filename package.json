@@ -1,0 +1,20 @@
+{
+  "name": "stillclawing",
+  "version": "1.0.0",
+  "description": "StillClawing - Dead Man's Switch for AI Agents on Sui",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "heartbeat": "tsx src/heartbeat.ts",
+    "monitor": "tsx src/monitor.ts",
+    "demo": "tsx src/demo.ts",
+    "setup": "tsx src/setup.ts"
+  },
+  "dependencies": {
+    "@mysten/sui": "^2.5.1",
+    "@mysten/walrus": "^1.0.3",
+    "@types/node": "^25.3.3",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}

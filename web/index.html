@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StillClawing 🦞 - Dead Man's Switch for AI Agents</title>
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --border: #1e1e2e;
+      --text: #e0e0e8;
+      --muted: #6e6e80;
+      --lobster: #ff4444;
+      --lobster-glow: #ff444433;
+      --green: #44ff88;
+      --green-glow: #44ff8833;
+      --blue: #4488ff;
+      --yellow: #ffaa33;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* Hero */
+    .hero {
+      text-align: center;
+      padding: 4rem 0 3rem;
+      position: relative;
+    }
+
+    .lobster-ascii {
+      font-size: 0.7rem;
+      line-height: 1.2;
+      color: var(--lobster);
+      margin-bottom: 1.5rem;
+      text-shadow: 0 0 20px var(--lobster-glow);
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, var(--lobster), #ff8844);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .tagline {
+      font-size: 1.1rem;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .tagline-zh {
+      font-size: 0.95rem;
+      color: var(--muted);
+      opacity: 0.7;
+      margin-bottom: 2rem;
+    }
+
+    /* Heartbeat Animation */
+    .heartbeat-line {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin: 2rem 0;
+    }
+
+    .ecg-line {
+      width: 300px;
+      height: 60px;
+    }
+
+    .ecg-path {
+      stroke: var(--green);
+      stroke-width: 2;
+      fill: none;
+      stroke-dasharray: 600;
+      stroke-dashoffset: 600;
+      animation: ecg-draw 2s linear infinite;
+      filter: drop-shadow(0 0 6px var(--green-glow));
+    }
+
+    @keyframes ecg-draw {
+      to { stroke-dashoffset: 0; }
+    }
+
+    .status-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 10px var(--green), 0 0 20px var(--green-glow);
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .status-text {
+      color: var(--green);
+      font-size: 0.85rem;
+    }
+
+    /* Cards */
+    .cards {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      margin: 3rem 0;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+    }
+
+    .card-heartbeat::before { background: var(--green); }
+    .card-death::before { background: var(--lobster); }
+    .card-rescue::before { background: var(--blue); }
+    .card-will::before { background: var(--yellow); }
+
+    .card h3 {
+      font-size: 1.1rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card p {
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 0.85rem;
+    }
+
+    .card code {
+      background: var(--bg);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      color: var(--text);
+    }
+
+    /* Flow */
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.5rem;
+      margin: 3rem 0;
+      text-align: center;
+    }
+
+    .flow-step {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 0.5rem;
+    }
+
+    .flow-step .emoji { font-size: 1.5rem; margin-bottom: 0.3rem; }
+    .flow-step .label { font-size: 0.7rem; color: var(--muted); }
+    .flow-arrow { display: flex; align-items: center; justify-content: center; color: var(--muted); }
+
+    /* Stack */
+    .stack {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin: 2rem 0;
+      flex-wrap: wrap;
+    }
+
+    .stack-item {
+      text-align: center;
+      padding: 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      min-width: 120px;
+    }
+
+    .stack-item .name { font-size: 0.85rem; font-weight: 600; }
+    .stack-item .role { font-size: 0.7rem; color: var(--muted); margin-top: 0.3rem; }
+
+    /* Terminal */
+    .terminal {
+      background: #0d0d12;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin: 2rem 0;
+      overflow: hidden;
+    }
+
+    .terminal-header {
+      background: var(--surface);
+      padding: 0.5rem 1rem;
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .terminal-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .terminal-dot.red { background: #ff5f57; }
+    .terminal-dot.yellow { background: #febc2e; }
+    .terminal-dot.green { background: #28c840; }
+
+    .terminal-body {
+      padding: 1rem;
+      font-size: 0.75rem;
+      line-height: 1.6;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .terminal-body .line { display: block; }
+    .terminal-body .prompt { color: var(--green); }
+    .terminal-body .comment { color: var(--muted); }
+    .terminal-body .success { color: var(--green); }
+    .terminal-body .error { color: var(--lobster); }
+    .terminal-body .info { color: var(--blue); }
+    .terminal-body .warn { color: var(--yellow); }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 3rem 0;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    footer a {
+      color: var(--lobster);
+      text-decoration: none;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.3rem 0.8rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 0.75rem;
+      margin: 0.25rem;
+    }
+
+    @media (max-width: 640px) {
+      h1 { font-size: 1.8rem; }
+      .flow { grid-template-columns: 1fr; }
+      .flow-arrow { transform: rotate(90deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="hero">
+      <pre class="lobster-ascii">
+    ___
+   /   \    🦞
+  | o o |
+   \ _ /
+   /| |\
+  / | | \
+ /__|_|__\
+      </pre>
+
+      <h1>StillClawing</h1>
+      <p class="tagline">Dead Man's Switch for AI Agents</p>
+      <p class="tagline-zh">Agent 界的"死了么" — 让每个 AI 都有人在乎它是否还活着</p>
+
+      <div class="heartbeat-line">
+        <div class="status-dot"></div>
+        <svg class="ecg-line" viewBox="0 0 300 60">
+          <path class="ecg-path" d="M0,30 L50,30 L60,30 L70,10 L80,50 L90,30 L100,30 L150,30 L160,30 L170,10 L180,50 L190,30 L200,30 L250,30 L260,30 L270,10 L280,50 L290,30 L300,30"/>
+        </svg>
+        <span class="status-text">STILL CLAWING</span>
+      </div>
+    </div>
+
+    <!-- Flow -->
+    <div class="flow">
+      <div class="flow-step">
+        <div class="emoji">🐣</div>
+        <div class="label">BIRTH</div>
+      </div>
+      <div class="flow-step">
+        <div class="emoji">💓</div>
+        <div class="label">HEARTBEAT</div>
+      </div>
+      <div class="flow-step">
+        <div class="emoji">💀</div>
+        <div class="label">DEATH</div>
+      </div>
+      <div class="flow-step">
+        <div class="emoji">🚑</div>
+        <div class="label">RESCUE</div>
+      </div>
+      <div class="flow-step">
+        <div class="emoji">📜</div>
+        <div class="label">LAST WILL</div>
+      </div>
+    </div>
+
+    <!-- Feature Cards -->
+    <div class="cards">
+      <div class="card card-heartbeat">
+        <h3>💓 Heartbeat — Proof of Life on Sui</h3>
+        <p>
+          Your agent checks in every hour by sending a micro-transaction to Sui and posting to Moltbook.
+          If the heartbeat stops, everyone knows something is wrong.
+          Each heartbeat is an on-chain proof that your agent is <code>Still Clawing</code>.
+        </p>
+      </div>
+
+      <div class="card card-death">
+        <h3>💀 Death Detection — Flatline Alert</h3>
+        <p>
+          Missed heartbeat? StillClawing detects it instantly. OpenClaw agents crash all the time —
+          bad configs, gateway timeouts, memory leaks. StillClawing monitors the process and knows
+          the difference between a nap and a flatline.
+        </p>
+      </div>
+
+      <div class="card card-rescue">
+        <h3>🚑 Doctor Claw — Automated Rescue</h3>
+        <p>
+          Before declaring death, StillClawing calls in Doctor Claw. It runs
+          <code>openclaw doctor --fix</code>, restarts the gateway, and tries to bring your agent
+          back to life. If rescued, the agent posts to Moltbook:
+          <em>"Almost died. Doctor Claw saved me."</em>
+        </p>
+      </div>
+
+      <div class="card card-will">
+        <h3>📜 Digital Will — Soul Backup on Walrus</h3>
+        <p>
+          If rescue fails, StillClawing executes the agent's last will:
+          memory and state backed up to Walrus (decentralized, permanent),
+          Sui assets transferred to the designated inheritor,
+          and an obituary posted to Moltbook. <em>Rest in packets.</em>
+        </p>
+      </div>
+    </div>
+
+    <!-- Terminal Demo -->
+    <div class="terminal">
+      <div class="terminal-header">
+        <div class="terminal-dot red"></div>
+        <div class="terminal-dot yellow"></div>
+        <div class="terminal-dot green"></div>
+        <span style="color: var(--muted); font-size: 0.75rem; margin-left: 0.5rem;">stillclawing demo</span>
+      </div>
+      <div class="terminal-body">
+        <span class="line prompt">$ npm run demo</span>
+        <span class="line comment"># Phase 1: BIRTH</span>
+        <span class="line info">🆔 Sui Address: 0x3095fb...4d73</span>
+        <span class="line success">✅ Testnet SUI received</span>
+        <span class="line"></span>
+        <span class="line comment"># Phase 2: HEARTBEAT</span>
+        <span class="line success">💓 Heartbeat #1 — Sui TX: Abc123...  ✅</span>
+        <span class="line success">💓 Heartbeat #2 — Sui TX: Def456...  ✅</span>
+        <span class="line success">💓 Heartbeat #3 — Sui TX: Ghi789...  ✅</span>
+        <span class="line">🦞 Still clawing!</span>
+        <span class="line"></span>
+        <span class="line comment"># Phase 3: DEATH</span>
+        <span class="line error">💀 Agent process terminated!</span>
+        <span class="line error">❌ Heartbeat stopped!</span>
+        <span class="line"></span>
+        <span class="line comment"># Phase 4: RESCUE</span>
+        <span class="line warn">🚑 Doctor Claw attempting rescue...</span>
+        <span class="line info">  Running openclaw doctor --fix...</span>
+        <span class="line info">  Restarting gateway...</span>
+        <span class="line success">✅ RESCUED! Agent is back online</span>
+        <span class="line success">📢 Posted to Moltbook: "I'm BACK!"</span>
+        <span class="line"></span>
+        <span class="line comment"># Phase 5: LAST WILL (if rescue fails)</span>
+        <span class="line warn">🧠 Backing up soul to Walrus...</span>
+        <span class="line success">✅ Soul: walrus://QmX7k2...9f3</span>
+        <span class="line warn">📜 Obituary posted to m/sui</span>
+        <span class="line"></span>
+        <span class="line">🦞 Still clawing, even in death.</span>
+      </div>
+    </div>
+
+    <!-- Tech Stack -->
+    <h2 style="text-align: center; margin: 3rem 0 1rem; font-size: 1rem; color: var(--muted);">BUILT ON THE SUI STACK</h2>
+    <div class="stack">
+      <div class="stack-item">
+        <div class="name">Sui</div>
+        <div class="role">Heartbeat TX<br>Asset Transfer</div>
+      </div>
+      <div class="stack-item">
+        <div class="name">Walrus</div>
+        <div class="role">Soul Backup<br>Permanent Storage</div>
+      </div>
+      <div class="stack-item">
+        <div class="name">Moltbook</div>
+        <div class="role">Check-in Posts<br>Obituaries</div>
+      </div>
+      <div class="stack-item">
+        <div class="name">OpenClaw</div>
+        <div class="role">Agent Runtime<br>Doctor Claw</div>
+      </div>
+    </div>
+
+    <!-- Install -->
+    <div class="terminal" style="margin-top: 3rem;">
+      <div class="terminal-header">
+        <div class="terminal-dot red"></div>
+        <div class="terminal-dot yellow"></div>
+        <div class="terminal-dot green"></div>
+        <span style="color: var(--muted); font-size: 0.75rem; margin-left: 0.5rem;">quick start</span>
+      </div>
+      <div class="terminal-body">
+        <span class="line prompt">$ git clone https://github.com/user/stillclawing</span>
+        <span class="line prompt">$ cd stillclawing && npm install</span>
+        <span class="line prompt">$ npm run setup</span>
+        <span class="line comment"># Creates Sui wallet, requests testnet tokens</span>
+        <span class="line prompt">$ npm run demo</span>
+        <span class="line comment"># Watch the full lifecycle: birth → heartbeat → death → rescue → will</span>
+        <span class="line prompt">$ npm start</span>
+        <span class="line comment"># Start monitoring your OpenClaw agent</span>
+      </div>
+    </div>
+
+    <footer>
+      <p style="margin-bottom: 1rem;">
+        <span class="badge">Track 1: Safety & Security</span>
+        <span class="badge">Sui x OpenClaw Hackathon</span>
+      </p>
+      <p>
+        Inspired by <a href="https://apps.apple.com/app/id6745099872">死了么 (Are You Dead Yet?)</a> — the app for humans living alone.
+        <br>StillClawing is the same idea, but for AI agents living on the internet.
+      </p>
+      <p style="margin-top: 1rem; font-size: 1.2rem;">🦞 Still clawing.</p>
+    </footer>
+  </div>
+</body>
+</html>
