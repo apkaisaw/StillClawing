@@ -4,3 +4,9 @@ dist/
 .env.*
 *.log
 .DS_Store
+
+# Internal docs with sensitive info (API keys, keypair paths)
+docs/HANDOFF.md
+
+# Move build artifacts
+move/stillclawing/build/
