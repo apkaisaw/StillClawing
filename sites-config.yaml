@@ -1,0 +1,10 @@
+contexts:
+  testnet:
+    package: 0xf99aee9f21493e1590e7e5a9aea6f343a1f381031a04a732724871fc294be799
+    staking_object: 0xbe46180321c30aab2f8b3501e24048377287fa708018a5b7c2792b35fe339ee3
+    general:
+      wallet_env: testnet
+      walrus_package: 0xa998b8719ca1c0a6dc4e24a859bbb39f5477417f71885fbf2967a6510f699144
+      gas_budget: 200000000
+
+default_context: testnet
